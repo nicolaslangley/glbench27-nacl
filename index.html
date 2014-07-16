@@ -1,0 +1,776 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Glbench27-nacl by nicolaslangley</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Glbench27-nacl</h1>
+        <p></p>
+
+        <p class="view"><a href="https://github.com/nicolaslangley/glbench27-nacl">View the Project on GitHub <small>nicolaslangley/glbench27-nacl</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/nicolaslangley/glbench27-nacl/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/nicolaslangley/glbench27-nacl/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/nicolaslangley/glbench27-nacl">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h2>
+<a name="porting-to-chrome-native-client-nacl" class="anchor" href="#porting-to-chrome-native-client-nacl"><span class="octicon octicon-link"></span></a>Porting to Chrome Native Client (NaCl)</h2>
+
+<h4>
+<a name="overview-of-document" class="anchor" href="#overview-of-document"><span class="octicon octicon-link"></span></a>Overview of Document</h4>
+
+<p>This document will outline the process of porting a C++ application to Chrome Native Client (NaCl).
+The documentation on NaCl can be confusing so I will try to clarify what I have been able to learn about how NaCl works
+and what is required to get an application up and running within Chrome.</p>
+
+<h4>
+<a name="table-of-contents" class="anchor" href="#table-of-contents"><span class="octicon octicon-link"></span></a>Table of Contents</h4>
+
+<ul>
+<li><a href="#pnaclvnacl">Native Client and Portable Native Client</a></li>
+<li><a href="#naclappstruct">Native Client Application Structure</a></li>
+<li><a href="#vs_tool">Visual Studio and Toolchain</a></li>
+<li><a href="#glbappoutline">GLBenchmark Application Outline</a></li>
+<li><a href="#naclmessage">NaCl Messaging</a></li>
+<li><a href="#instance_gl_setup">NaCl Instance and OpenGL Setup</a></li>
+<li><a href="#naclthreads">NaCl Threads and SwapBuffers</a></li>
+<li><a href="#naclfileio">NaCl File I/O</a></li>
+<li><a href="#assetman">Asset Management</a></li>
+<li><a href="#convertchromeapp">Converting to NaCl Chrome App</a></li>
+<li><a href="#debuglog">Debugging and Logging</a></li>
+</ul><h4>
+<a name="-native-client-and-portable-native-client" class="anchor" href="#-native-client-and-portable-native-client"><span class="octicon octicon-link"></span></a> Native Client and Portable Native Client</h4>
+
+<p>As outlined <a href="https://developer.chrome.com/native-client/nacl-and-pnacl">here</a> there is a distinction made between
+Portable Native Client (PNaCl) and Native Client (NaCl). The source code of the module does not vary between the two
+(although there are some restrictions in PNaCl) but there there are a number of differences regarding the toolchain.
+For this project, I have used the standard Native Client toolchain as (although Google suggests using PNaCl) the PNaCl
+toolchain is much less stable and less clearly documented.</p>
+
+<h4>
+<a name="-native-client-application-structure" class="anchor" href="#-native-client-application-structure"><span class="octicon octicon-link"></span></a> Native Client Application Structure</h4>
+
+<p>The structure of a NaCl application involves 4 main components. These are:</p>
+
+<ul>
+<li>HTML file (<code>.html</code>)</li>
+<li>JavaScript file (<code>.js</code>)</li>
+<li>NaCl manifest (<code>.nmf</code>)</li>
+<li>NaCl module (<code>.nexe</code>)</li>
+</ul><p>The HTML file and JavaScript file are the entry point to the NaCl module and house traditional web code. The NaCl manifest
+file specifies the properties of your module and the NaCl module itself contains your compiled native code in <code>.nexe</code> format.</p>
+
+<p>You can get a description of each of these items from Google 
+<a href="https://developer.chrome.com/native-client/devguide/coding/application-structure">here</a>. I will detail the composition of
+each of these files within the GLBenchmark example:</p>
+
+<p>As explained in the documentation, the HTML file must contain an <code>&lt;embed&gt;</code> element that triggers the loading of the 
+NaCl module.</p>
+
+<p>The <code>&lt;embed&gt;</code> element within the GLBenchmark example (let's just call it GLB) is as follows:</p>
+
+<div class="highlight highlight-html"><pre><span class="nt">&lt;embed</span> <span class="na">id=</span><span class="s">"glbench_nacl_vs10"</span>
+           <span class="na">width=</span><span class="s">1280</span> <span class="na">height=</span><span class="s">720</span>
+           <span class="na">src=</span><span class="s">"newlib/glbench_nacl_vs10.nmf"</span>
+           <span class="na">type=</span><span class="s">"application/x-nacl"</span> <span class="nt">/&gt;</span>
+</pre></div>
+
+<p>As you can see, we are specifying the location of the NaCl manifest file as well as specifying that the type of the embed is
+<code>application/x-nacl</code>. Finally, we outline both the width and height of the area that the NaCl module will manage in the 
+webpage.</p>
+
+<p>The NaCl manifest (<code>.nmf</code>) file for this project is:</p>
+
+<pre><code>{
+  "files": {},
+  "program": {
+    "x86-64": {
+      "url": "glbench_nacl_vs10_64.nexe"
+    }
+  }
+}
+</code></pre>
+
+<p>The program component specifies to location of the compiled <code>.nexe</code> file for each architecture. In this case, there only
+exists one <code>.nexe</code> for the 64-bit x86 architecture. A more in-depth look at <code>.nmf</code> files can be found 
+<a href="https://developer.chrome.com/native-client/reference/nacl-manifest-format">here</a>.</p>
+
+<p>The NaCl module is where all of the native code lives. When compiled we have a <code>.nexe</code> file. In order for native code to be
+compiled into a NaCl module, there are a number of components that must exist in the code.</p>
+
+<ul>
+<li>a factory function <code>CreateModule()</code>
+</li>
+<li>a Module class (derived from <code>pp::Module</code>)</li>
+<li>an Instance class (derived from <code>pp::Instance</code>)</li>
+</ul><p>These components are outlined in more depth <a href="https://developer.chrome.com/native-client/devguide/coding/application-structure#native-client-modules-a-closer-look">here</a>.</p>
+
+<p>For GLB, all of the NaCl related code exists in a C++ file called <code>nacl_main.cpp</code>.
+An outline of this file with these components present is:</p>
+
+<div class="highlight highlight-cpp"><pre><span class="cp">#include "ppapi/cpp/instance.h"</span>
+<span class="cp">#include "ppapi/cpp/module.h"</span>
+
+
+<span class="c1">// Instance class that extends pp::Instance</span>
+<span class="k">class</span> <span class="nc">GLBenchInstance</span> <span class="o">:</span> <span class="k">public</span> <span class="n">pp</span><span class="o">::</span><span class="n">Instance</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+  <span class="k">explicit</span> <span class="n">GLBenchInstance</span><span class="p">(</span><span class="n">PP_Instance</span> <span class="n">instance</span><span class="p">)</span>
+    <span class="o">:</span> <span class="n">pp</span><span class="o">::</span><span class="n">Instance</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span> <span class="p">{}</span>
+
+  <span class="k">virtual</span> <span class="o">~</span><span class="n">GLBenchInstance</span><span class="p">()</span> <span class="p">{}</span>
+
+<span class="p">};</span>
+
+<span class="c1">// Module class that extends pp::Module</span>
+<span class="k">class</span> <span class="nc">GLBenchModule</span> <span class="o">:</span> <span class="k">public</span> <span class="n">pp</span><span class="o">::</span><span class="n">Module</span> <span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+  <span class="n">GLBenchModule</span><span class="p">()</span> <span class="o">:</span> <span class="n">pp</span><span class="o">::</span><span class="n">Module</span><span class="p">()</span> <span class="p">{}</span>
+  <span class="k">virtual</span> <span class="o">~</span><span class="n">GLBenchModule</span><span class="p">()</span> <span class="p">{}</span>
+
+  <span class="k">virtual</span> <span class="n">pp</span><span class="o">::</span><span class="n">Instance</span><span class="o">*</span> <span class="n">CreateInstance</span><span class="p">(</span><span class="n">PP_Instance</span> <span class="n">instance</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">GLBenchInstance</span><span class="p">(</span><span class="n">instance</span><span class="p">);</span>
+  <span class="p">}</span>
+
+<span class="p">};</span>
+
+<span class="k">namespace</span> <span class="n">pp</span> <span class="p">{</span>
+  <span class="c1">// Factory method for creating module</span>
+  <span class="n">Module</span><span class="o">*</span> <span class="n">CreateModule</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">GLBenchModule</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>The instance created corresponds to the space on the webpage that is managed by the NaCl module. The NaCl module class
+is used by the browser to create a module object that is the main binding point between the browser and the NaCl module.
+An instance is created by the module whenever there is an <code>&lt;embed&gt;</code> element within the webpage that references the module.</p>
+
+<h4>
+<a name="-visual-studio-and-toolchain" class="anchor" href="#-visual-studio-and-toolchain"><span class="octicon octicon-link"></span></a> Visual Studio and Toolchain</h4>
+
+<p>For developing NaCl applications, there are a couple of different tools available. After downloading the 
+<a href="https://developer.chrome.com/native-client/sdk/download">NaCl SDK</a>, you can either:</p>
+
+<ul>
+<li>Use a <code>makefile</code> and build your project manually</li>
+<li>Install Google's provided Visual Studio 2010 plugin</li>
+</ul><p><a href="https://developer.chrome.com/native-client/devguide/devcycle/building">Here</a> is the provided documentation on building
+a Native Client module. It largely focuses on how to build a PNaCl <code>.pexe</code> and so will be largely ignored for this section.</p>
+
+<p><strong>Note:</strong> The Visual Studio plugin does not have stable PNaCl support and I found that the only reliable way
+to build a <code>.pexe</code> was using makefiles (see the <code>GLBenchmark_2_7_0/Projects/nacl/PNaCl Make</code> folder for an example)</p>
+
+<p>The easiest method, and the method I took, was to install and use the Visual Studio 2010 plugin. Documentation on
+installing the plugin can be found <a href="https://developer.chrome.com/native-client/devguide/devcycle/vs-addin">here</a>.
+An item of note is that the compiled application can only be run in debug mode from within Visual Studio and that a server
+must already be running before it can do so (the default is <code>http://localhost:5103</code>)</p>
+
+<h4>
+<a name="-glbenchmark-application-outline" class="anchor" href="#-glbenchmark-application-outline"><span class="octicon octicon-link"></span></a> GLBenchmark Application Outline</h4>
+
+<p>Here is very quick outline of the structure of the GLBenchmark application used in this example. I have tried to gloss over
+as many details as possible but some understanding of the structure of the application will hopefully aid in
+understanding the porting process.</p>
+
+<p>The GLBenchmark application looks to run a series of tests and measure the performance in order to output results.
+With this being the case, the basic application loop consists of the following steps:</p>
+
+<ol>
+<li>Setup the GLB application</li>
+<li>Add a number of tests to be run</li>
+<li>Select a test</li>
+<li>Initialize the test and run it</li>
+<li>Finish the test and output results</li>
+<li>Continue to run tests until there are none left</li>
+<li>Close application</li>
+</ol><p>The codebase for GLB is composed of an <code>GLB::Application</code> class that handles all of the rendering, animation and other
+details regarding running a test. This class contains no platform-specific code and does the majority of the work. It
+provides the ability to run select, initialize, run and output the results of any specified test.</p>
+
+<p>In addition, for each platform (i.e. Android, OSX, NaCl) that the application supports, there is a platform-specific set of
+code that includes the entry to the main loop and the main application loop itself. For the port of GLBenchmark, all of the
+<code>GLB::Application</code> code was left untouched and a new set of NaCl specific code was added. This code had to encompass all
+functionality outside of that provided by <code>GLB::Application</code>, namely setting up the application, handling input, initializing
+assets and communicating with the user.</p>
+
+<h4>
+<a name="-nacl-messaging" class="anchor" href="#-nacl-messaging"><span class="octicon octicon-link"></span></a> NaCl Messaging</h4>
+
+<p>Since Native Client is a component that exists within a webpage, there is a need to communicate between the webpage, 
+generally using JavaScript, and the NaCl module. Google provides an interface for doing just that. It is outlined
+<a href="https://developer.chrome.com/native-client/devguide/coding/message-system">here</a>.</p>
+
+<p>Within this project, messaging between the NaCl module and the user facing webpage has been used to communicate the user's
+choice of test to the NaCl module as well as to communicate the NaCl module's status to be displayed by the webpage.</p>
+
+<p>The relevant messaging function within the NaCl module is:</p>
+
+<div class="highlight highlight-cpp"><pre><span class="c1">// Handle message sent from JavaScript</span>
+<span class="k">virtual</span> <span class="kt">void</span> <span class="nf">HandleMessage</span><span class="p">(</span><span class="k">const</span> <span class="n">pp</span><span class="o">::</span><span class="n">Var</span><span class="o">&amp;</span> <span class="n">var_message</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// Ignore the message if it is not a string.</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">var_message</span><span class="p">.</span><span class="n">is_string</span><span class="p">())</span>
+    <span class="k">return</span><span class="p">;</span>
+  <span class="c1">// Convert message to a string</span>
+  <span class="n">PostMessage</span><span class="p">(</span><span class="s">"Message received"</span><span class="p">);</span>
+  <span class="n">PostMessage</span><span class="p">(</span><span class="n">var_message</span><span class="p">);</span>
+  <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">message_str</span> <span class="o">=</span> <span class="n">var_message</span><span class="p">.</span><span class="n">AsString</span><span class="p">();</span>
+
+  <span class="c1">// If the message received is 'Start', then setup the GLB application on application thread</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">message_str</span> <span class="o">==</span> <span class="s">"Start"</span><span class="p">)</span> 
+  <span class="p">{</span>
+    <span class="n">glb_app_thread</span><span class="p">.</span><span class="n">message_loop</span><span class="p">().</span><span class="n">PostWork</span><span class="p">(</span><span class="n">m_callback_factory</span><span class="p">.</span><span class="n">NewCallback</span><span class="p">(</span><span class="o">&amp;</span><span class="n">GLBenchInstance</span><span class="o">::</span><span class="n">SetupGLBApplication</span><span class="p">));</span> 
+    <span class="k">return</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="c1">// If the message is 'NextTest' tell window that next test command has been started</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">message_str</span> <span class="o">==</span> <span class="s">"NextTest"</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">PostMessage</span><span class="p">(</span><span class="s">"Moving to next test"</span><span class="p">);</span>
+    <span class="c1">// This crashes somewhere down the line</span>
+    <span class="n">m_wnd</span><span class="o">-&gt;</span><span class="n">handle_cmd</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="c1">// Set onscreen or offscreen value for trex test</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">message_str</span> <span class="o">==</span> <span class="s">"trex_on"</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">m_onscreen_test</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">message_str</span> <span class="o">==</span> <span class="s">"trex_off"</span><span class="p">)</span>
+  <span class="p">{</span>
+    <span class="n">m_onscreen_test</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>This function processes the message sent from the webpage and parses it to either start the application, move to the next
+test or start the default TRex test in onscreen or offscreen mode.</p>
+
+<p>The messaging function within the JavaScript is:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="c1">// Handle message sent from NaCL module ( using pp::Instance.PostMessage())</span>
+<span class="c1">// Display to console</span>
+<span class="kd">function</span> <span class="nx">handleMessage</span><span class="p">(</span><span class="nx">message_event</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// Display to console</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">message_event</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
+  <span class="c1">// Parse incoming message string and update status with any messages prefixed by 'GLB'</span>
+  <span class="kd">var</span> <span class="nx">newStr</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">String</span><span class="p">(</span><span class="nx">message_event</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">newStr</span><span class="p">.</span><span class="nx">charAt</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="s1">'G'</span> <span class="o">&amp;&amp;</span> <span class="nx">newStr</span><span class="p">.</span><span class="nx">charAt</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="s1">'L'</span> <span class="o">&amp;&amp;</span> <span class="nx">newStr</span><span class="p">.</span><span class="nx">charAt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="s1">'B'</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">updateStatus</span><span class="p">(</span><span class="nx">message_event</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">newStr</span> <span class="o">==</span> <span class="s2">"ExitModule"</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// ExitModule message ends NaCl module</span>
+    <span class="nx">endModule</span><span class="p">();</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>This function logs any output from the NaCl module to the log and calls an <code>updateStatus()</code> function if the message is
+prefixed by <code>GLB</code>.</p>
+
+<h4>
+<a name="-nacl-instance-and-opengl-setup" class="anchor" href="#-nacl-instance-and-opengl-setup"><span class="octicon octicon-link"></span></a> NaCl Instance and OpenGL Setup</h4>
+
+<p>Now we will look at the intial setup of a NaCl instance as well as how to create a graphics context.
+Once a NaCl instance has been created, any initialization code can be done in the <code>init</code> function. This function has
+the prototype:</p>
+
+<div class="highlight highlight-cpp"><pre><span class="k">virtual</span> <span class="kt">bool</span> <span class="n">Init</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">argc</span><span class="p">,</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argn</span><span class="p">[],</span> <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+</pre></div>
+
+<p>NaCl does not have allow direct access to the graphics context and in fact, there is no EGL in NaCl. All of the graphics
+setup is done using Google's PPAPI using a <code>pp::Graphics3D</code> object. In order to create the context and use OpenGL functions,
+you must include <code>ppapi/lib/gl/gles2/gl2ext_ppapi.h</code> and <code>ppapi/cpp/graphics_3d.h</code>. Within the GLB code, in <code>nacl_main.cpp</code>
+there is an <code>InitGL</code> function:</p>
+
+<div class="highlight highlight-cpp"><pre><span class="c1">// Sets up Context for drawing and makes it available globally</span>
+<span class="kt">bool</span> <span class="nf">InitGL</span><span class="p">(</span><span class="kt">int32_t</span> <span class="n">new_width</span><span class="p">,</span> <span class="kt">int32_t</span> <span class="n">new_height</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// Attempt to initialize OpenGL using PPAPI</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">glInitializePPAPI</span><span class="p">(</span><span class="n">pp</span><span class="o">::</span><span class="n">Module</span><span class="o">::</span><span class="n">Get</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">get_browser_interface</span><span class="p">()))</span> 
+  <span class="p">{</span>
+    <span class="n">PostMessage</span><span class="p">(</span><span class="s">"Unable to initialize GL PPAPI!);</span>
+    <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Define attributes for graphics context</span>
+  <span class="k">const</span> <span class="kt">int32_t</span> <span class="n">attrib_list</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">PP_GRAPHICS3DATTRIB_DEPTH_SIZE</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span>
+    <span class="n">PP_GRAPHICS3DATTRIB_WIDTH</span><span class="p">,</span> <span class="n">new_width</span><span class="p">,</span>
+    <span class="n">PP_GRAPHICS3DATTRIB_HEIGHT</span><span class="p">,</span> <span class="n">new_height</span><span class="p">,</span>
+    <span class="n">PP_GRAPHICS3DATTRIB_NONE</span>
+  <span class="p">};</span>
+
+  <span class="c1">// Create new context with given attribute list</span>
+  <span class="n">m_context</span> <span class="o">=</span> <span class="n">pp</span><span class="o">::</span><span class="n">Graphics3D</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="n">attrib_list</span><span class="p">);</span>\
+  <span class="c1">// Set global context to be current context for egllibs</span>
+  <span class="n">egllib_context</span> <span class="o">=</span> <span class="n">m_context</span><span class="p">;</span>
+  <span class="c1">// Attempt to bind 3d context</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">BindGraphics</span><span class="p">(</span><span class="n">m_context</span><span class="p">))</span> 
+  <span class="p">{</span>
+    <span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span> <span class="s">"Unable to bind 3d context!</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+    <span class="n">m_context</span> <span class="o">=</span> <span class="n">pp</span><span class="o">::</span><span class="n">Graphics3D</span><span class="p">();</span>
+    <span class="n">glSetCurrentContextPPAPI</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="n">glSetCurrentContextPPAPI</span><span class="p">(</span><span class="n">m_context</span><span class="p">.</span><span class="n">pp_resource</span><span class="p">());</span>    
+
+  <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>More information about setting up OpenGL in NaCl can be found <a href="https://developer.chrome.com/native-client/devguide/coding/3D-graphics">here</a></p>
+
+<p>The fact that there is no EGL present within NaCl (it is obscured by <code>pp::Graphics3D</code>) can cause trouble when dealing with
+a codebase that uses EGL. In order to handle this problem in the GLB example, I was forced to implement the EGL header and
+functions. This involved creating a <code>include\egl.h</code> file that specified the following EGL functions:</p>
+
+<div class="highlight highlight-cpp"><pre><span class="c1">// EGL function prototypes - to be overwritten using NaCl</span>
+<span class="kt">unsigned</span> <span class="kt">int</span> <span class="nf">eglGetConfigAttrib</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span> <span class="n">display</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span> <span class="n">config</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">attribute</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span> <span class="n">value</span><span class="p">);</span>
+<span class="kt">unsigned</span> <span class="kt">int</span> <span class="nf">eglGetConfigAttrib</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span> <span class="n">display</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span> <span class="n">config</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">attribute</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="o">*</span> <span class="n">value</span><span class="p">);</span>
+<span class="kt">unsigned</span> <span class="kt">int</span> <span class="nf">eglGetConfigs</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span> <span class="n">display</span><span class="p">,</span> <span class="kt">void</span> <span class="o">**</span> <span class="n">configs</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">config_size</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="o">*</span> <span class="n">num_config</span><span class="p">);</span>
+<span class="kt">char</span> <span class="k">const</span> <span class="o">*</span> <span class="nf">eglQueryString</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span> <span class="n">display</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">name</span><span class="p">);</span>
+</pre></div>
+
+<p>These were then implemented (without full functionality) in order to not break the existing source code. Full functionality
+was not required because <code>pp::Graphics3D</code> effectively replaces EGL. The partial implementations are found below:</p>
+
+<div class="highlight highlight-cpp"><pre><span class="cp">#include &lt;EGL/egl.h&gt;</span>
+<span class="cp">#include "ppapi/lib/gl/gles2/gl2ext_ppapi.h"</span>
+<span class="cp">#include "ppapi\cpp\graphics_3d.h"</span>
+<span class="cp">#include "ppapi\c\ppb_graphics_3d.h"</span>
+
+<span class="c1">// Global Graphics3D context to be set to current context by main instance</span>
+<span class="n">pp</span><span class="o">::</span><span class="n">Graphics3D</span> <span class="n">egllib_context</span><span class="p">;</span>
+
+<span class="c1">// Override EGL functions using NaCl Graphics3D API</span>
+<span class="c1">// Handle both case where value is unsigned or signed</span>
+<span class="kt">unsigned</span> <span class="kt">int</span> <span class="nf">eglGetConfigAttrib</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span> <span class="n">display</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span> <span class="n">config</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">attribute</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="o">*</span> <span class="n">value</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="n">eglGetConfigAttrib</span><span class="p">(</span> <span class="n">display</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">attribute</span><span class="p">,</span> <span class="p">(</span><span class="kt">int</span><span class="o">*</span><span class="p">)</span><span class="n">value</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">unsigned</span> <span class="kt">int</span> <span class="nf">eglGetConfigAttrib</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span> <span class="n">display</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span> <span class="n">config</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">attribute</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span> <span class="n">value</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kt">int32_t</span> <span class="n">attrib_list</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span><span class="n">attribute</span><span class="p">,</span> <span class="mi">0</span><span class="p">};</span>
+  <span class="n">PP_Resource</span> <span class="n">context</span> <span class="o">=</span> <span class="n">glGetCurrentContextPPAPI</span><span class="p">();</span>
+  <span class="kt">int32_t</span> <span class="n">return_value</span> <span class="o">=</span> <span class="n">egllib_context</span><span class="p">.</span><span class="n">GetAttribs</span><span class="p">(</span><span class="n">attrib_list</span><span class="p">);</span>
+  <span class="k">return</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="n">return_value</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// Does this need to be implemented or can we return dummy information?</span>
+<span class="kt">unsigned</span> <span class="kt">int</span> <span class="nf">eglGetConfigs</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span> <span class="n">display</span><span class="p">,</span> <span class="kt">void</span> <span class="o">**</span> <span class="n">configs</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">config_size</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="o">*</span> <span class="n">num_config</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">char</span> <span class="k">const</span> <span class="o">*</span> <span class="nf">eglQueryString</span><span class="p">(</span>    <span class="kt">void</span><span class="o">*</span> <span class="n">display</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">name</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="s">""</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+<h4>
+<a name="-nacl-threads-and-swapbuffers" class="anchor" href="#-nacl-threads-and-swapbuffers"><span class="octicon octicon-link"></span></a> NaCl Threads and SwapBuffers</h4>
+
+<p>When working with NaCl there are some important things to node when trying to render or perform I/O. Each Chrome tab runs as
+it's own process and has it's own main thread. Once a NaCl module is started, it is run in its own, sandboxed, process that
+is seperate from the main Chrome process that is associated with each tab. The NaCl module runs it's own main thread as well.
+Communication between both the NaCl main thread and the Chrome main thread are handled using PPAPI calls.</p>
+
+<p>This all pertains to rendering 3D graphics because we must use a special function, called from out NaCl thread, in order to
+swap buffers in the Chrome main thread in order for anything to be displayed on the screen.</p>
+
+<p>The documentation for this function can be found <a href="https://developer.chrome.com/native-client/pepper_stable/c/struct_p_p_b___graphics3_d__1__0#a293c6941c0da084267ffba3954793497">here</a></p>
+
+<p>This function is non-blocking and requires that a callback function is provided. In short, it performs some work on the
+Chrome main thread and then once this is complete, it calls the provided callback function on the Native Client thread.
+I found that this behaviour makes handling the main render loop much more complicated than it needs to be.</p>
+
+<p>Here is an image (from Google) of the expected communication between the Chrome and NaCl threads:</p>
+
+<p><img src="https://developer.chrome.com/native-client/images/3d-graphics-render-loop.png?raw=true" alt=""></p>
+
+<p>Let's now look at how I went about handling this issue in the GLB example.</p>
+
+<p>Looking at the main application loop for GLB used in the linux version of GLB we can see that it has the following form:</p>
+
+<ol>
+<li>Initialize and create GLB application</li>
+<li>Loop over list of selected tests</li>
+<li>Select test and render loading screen
+
+<ul>
+<li>Make a call to swapbuffers after rendering loading screen</li>
+</ul>
+</li>
+<li>Loop while running current test to render and animate
+
+<ul>
+<li>Make a call to swapbuffers for each loop</li>
+</ul>
+</li>
+</ol><p>You can see the full code for the main loop <a href="https://gist.github.com/nicolaslangley/eeb6dc8c5411c2ef8782">here</a></p>
+
+<p>The calls to swapbuffer made in the linux version are assumed to be blocking on the main application thread. However,
+within the Native Client paradigm, the <code>pp::Graphics3D::SwapBuffers</code> call is non-blocking on the Native Client thread.
+This requires a revision of the main application loop to accomodate this and involves splitting up the main loop into a
+number of functions that can be passed as callback functions to <code>pp::Graphics3D::SwapBuffers</code>. The set of functions that
+provide analogous functionality to the linux main loop above are:</p>
+
+<ul>
+<li>
+<code>SetupGLBApplication()</code>
+
+<ul>
+<li>Creates graphics context</li>
+<li>Sets up GLB application and parses application parameters</li>
+<li>Calls <code>SetupTests()</code>
+</li>
+</ul>
+</li>
+<li>
+<code>SetupTests()</code>
+
+<ul>
+<li>This function handles the setup portion of the main loop</li>
+<li>Chooses which test to run</li>
+<li>Renders loading screen</li>
+<li>Makes a call to <code>pp::Graphics3D::SwapBuffers</code> with <code>InitTest()</code> as callback</li>
+<li>If no test is chosen, calls <code>ExitTests()</code>
+</li>
+</ul>
+</li>
+<li>
+<code>InitTest()</code>
+
+<ul>
+<li>Initialize the test within the GLB application</li>
+<li>Renders running screen</li>
+<li>Makes a call to <code>pp::Graphics3D::SwapBuffers</code> with <code>RunTest()</code> as callback</li>
+</ul>
+</li>
+<li>
+<code>RunTest()</code>
+
+<ul>
+<li>Performs animation and rendering of the current test</li>
+<li>Continually calls <code>pp::Graphics3D::SwapBuffers</code> with itself as callback until test is finished</li>
+<li>This mimics the test loop found in the Linux version</li>
+<li>When test is finished, calls <code>EndTest()</code>
+</li>
+</ul>
+</li>
+<li>
+<code>EndTest()</code>
+
+<ul>
+<li>Handles finishing up of currently running test</li>
+<li>Calls <code>SetupTests()</code>
+</li>
+</ul>
+</li>
+<li>
+<code>ExitTest()</code>
+
+<ul>
+<li>Cleans up GLB application</li>
+<li>Outputs results and exits NaCl module</li>
+</ul>
+</li>
+</ul><p>The source for the above functions can be found <a href="https://gist.github.com/nicolaslangley/b0c03840b432c2db3259">here</a></p>
+
+<p><strong>Note:</strong> All functions passed as callbacks to a function must have <code>int32_t</code> as parameter (e.g. <code>void InitTest(int32_t)</code>)</p>
+
+<p>The behaviour of <code>pp::Graphics3D::SwapBuffers</code> requires the use of multiple functions in place of one contiguous loop in a
+traditional main function. For this example, it was possible to make this modification fairly seamlessly, it is something to
+consider when looking at applications that may require more complex usage of <code>pp::Graphics3D::SwapBuffers</code>.</p>
+
+<p>Rendering isn't the only behaviour within Native Client that requires special care. <code>pp::Graphics3D::SwapBuffers</code> is 
+non-blocking on the Native Client main thread because you <strong>cannot block</strong> on the main NaCl thread. This leads to a
+number of issues when trying to perform some basic tasks (e.g. C style File I/O).</p>
+
+<p>The GLB codebase makes extensive use of blocking calls and so In order to find a way around the restriction of being unable
+to block on the main Native Client thread, I had to create a second worker thread that performed all meaningful GLB-related
+tasks.</p>
+
+<p>Creating a thread within your NaCl module can be done using the <code>pp::SimpleThread</code> class.
+To create and start new thread:</p>
+
+<div class="highlight highlight-cpp"><pre><span class="cp">#include "ppapi/utility/threading/simple_thread.h"</span>
+<span class="n">pp</span><span class="o">::</span><span class="n">SimpleThread</span> <span class="n">glb_app_thread</span><span class="p">;</span>
+<span class="n">glb_app_thread</span><span class="p">.</span><span class="n">Start</span><span class="p">();</span>
+</pre></div>
+
+<p>To close the thread (in GLB this is in the instance destructor) use <code>glb_app_thread.Join();</code></p>
+
+<p>In order to assign work to the worker thread, you have to use the <a href="https://developer.chrome.com/native-client/pepper_stable/cpp/classpp_1_1_message_loop"><code>pp::MessageLoop</code></a> 
+class to post work to the thread. An example of this is posting the <code>SetupGLBApplication()</code> function to be run on the
+<code>glb_app_thread</code>:</p>
+
+<div class="highlight highlight-cpp"><pre><span class="n">glb_app_thread</span><span class="p">.</span><span class="n">message_loop</span><span class="p">().</span><span class="n">PostWork</span><span class="p">(</span><span class="n">m_callback_factory</span><span class="p">.</span><span class="n">NewCallback</span><span class="p">(</span><span class="o">&amp;</span><span class="n">GLBenchInstance</span><span class="o">::</span><span class="n">SetupGLBApplication</span><span class="p">));</span>
+</pre></div>
+
+<p><strong>Note:</strong> In this example, I elected to run the entire GLB application on a worker background thread and only handle basic
+communication between the main Native Client thread and the Chrome main thread. This was due to the use of blocking I/O
+calls present within the GLB application.</p>
+
+<h4>
+<a name="-nacl-file-io" class="anchor" href="#-nacl-file-io"><span class="octicon octicon-link"></span></a> NaCl File I/O</h4>
+
+<p>The previous section offers a nice segue into how File I/O is done in Native Client. There are two distinct facilities
+available for performing File I/O. Firstly, you can use the <a href="https://developer.chrome.com/native-client/pepper_stable/cpp/classpp_1_1_file_i_o"><code>pp::FileIO</code></a>
+class to perform non-blocking File I/O within the main Native Client thread. An in depth look into how to use this API is
+provided <a href="https://developer.chrome.com/native-client/devguide/coding/file-io">here</a></p>
+
+<p>Google also provides the ability to perform traditional blocking I/O by way of the <code>nacl_io</code> library. This library provides
+access to traditional C-style File I/O (i.e. <code>fopen</code>, <code>fread</code>, etc.) that allow for the use of more traditional blocking I/O.
+An explanation of how this library works is available <a href="https://developer.chrome.com/native-client/devguide/coding/nacl_io">here</a>.
+The examples all deal with a C application and setup, so I will detail how I used the library within the GLB application.</p>
+
+<p>In order to setup the <code>nacl_io</code> library, you must include both <code>nacl_io/nacl_io.h</code> and <code>sys/mount.h</code>. We can then
+initialize the library by making the following call:</p>
+
+<div class="highlight highlight-cpp"><pre><span class="n">nacl_io_init_ppapi</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">pp_instance</span><span class="p">(),</span> <span class="n">pp</span><span class="o">::</span><span class="n">Module</span><span class="o">::</span><span class="n">Get</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">get_browser_interface</span><span class="p">());</span>
+</pre></div>
+
+<p>All File I/O within NaCl requires a file system to be active. Since we are operating within the browser, there is no
+access to the system file system, but we can use the HTML5 Persistent Storage to read and write files from. In order to use
+a file system within NaCl, and <code>nacl_io</code> specifically, we must mount the desired file system using <code>mount</code>. This is done
+as follows:</p>
+
+<div class="highlight highlight-cpp"><pre><span class="c1">// Unmount default file system and mount persistent HTML5 filesystem</span>
+<span class="n">umount</span><span class="p">(</span><span class="s">"/"</span><span class="p">);</span>
+<span class="kt">int</span> <span class="n">mount_result</span> <span class="o">=</span> <span class="n">mount</span><span class="p">(</span><span class="s">""</span><span class="p">,</span><span class="s">"/persistent"</span><span class="p">,</span><span class="s">"html5fs"</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="s">"type=PERSISTENT,expected_size=1048576"</span><span class="p">);</span>
+</pre></div>
+
+<p><strong>Note:</strong> while <code>nacl_io</code> and the <code>pp::FileIO</code> API use the same file system, they are set up differently</p>
+
+<p>Once we have mounted the filesystem and initialized the <code>nacl_io</code> library, it is possible to use traditional C-style file I/O
+calls throughout the application. The only requirement is that these blocking calls cannot occur on the main Native Client
+thread. For details on this see <a href="#naclthreads">the threading section</a></p>
+
+<h4>
+<a name="-asset-management" class="anchor" href="#-asset-management"><span class="octicon octicon-link"></span></a> Asset Management</h4>
+
+<p>If the program being ported as a large number of assets required, there are a couple of different options for obtaining them
+for use in your Native Client application. If you are able to host the required files on your own webserver, you can use
+the NaCl <a href="https://developer.chrome.com/native-client/pepper_stable/cpp/classpp_1_1_u_r_l_loader">URLLoader API</a> to download
+them and save them to the HTML5 persistent storage. Details on how to do this can be found <a href="https://developer.chrome.com/native-client/devguide/coding/url-loading">here</a></p>
+
+<p>With the GLB example, I took a different approach. In order to read and write to files, they must be present in the HTML5
+persistent file storage that is mounted and used by the <code>nacl_io</code> library. Instead of loading and downloading URLs witin the
+Native Client module, I instead chose to load the HTML5 persistent filesystem and copy the relevant files within JavaScript
+as part of the webpage that hosts the Native Client module.</p>
+
+<p>In order to do this, I relied on the user specifying the location of the relevant asset files on their local machine.</p>
+
+<p><strong>Note:</strong> After I detail more about how to package the application into a Chrome App, I will show how to bundle the assets
+so that no user input is required</p>
+
+<p>Chrome supports the <code>FileSystem API</code> (for more see <a href="http://www.html5rocks.com/en/tutorials/file/filesystem/">here</a>) and this
+can be used to read and write files to HTML5 persistent storage.</p>
+
+<p>To present the user with the option of selecting a directory for uploading, you must add an input element to your HTML
+document.</p>
+
+<div class="highlight highlight-html"><pre><span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"file"</span> <span class="na">id=</span><span class="s">"file_input"</span> <span class="na">webkitdirectory=</span><span class="s">""</span> <span class="na">directory=</span><span class="s">""</span><span class="nt">/&gt;</span>
+</pre></div>
+
+<p>After adding a listener to this DOM element we can process the generated event and iterate through the selected files.
+The process of iterating through files and copying them from the user's file system to the HTML5 persistent storage requires
+a number of steps:</p>
+
+<ol>
+<li>Iterate through all of the selected files</li>
+<li>For each file download the file from the user's file system</li>
+<li>Create the directory housing the file within HTML5 persistent storage</li>
+<li>Save the file to HTML5 persistent storage</li>
+</ol><p>These steps are done using 4 JavaScript functions</p>
+
+<ul>
+<li>
+<code>handleFileSelect(evt)</code>
+
+<ul>
+<li>Gets list of selected files</li>
+<li>Calls <code>handleFile(file)</code> to handle the first selected file</li>
+</ul>
+</li>
+<li>
+<code>handleFile(file)</code>
+
+<ul>
+<li>If all files have been loaded, update HTML status and end</li>
+<li>Gets URL for specified file</li>
+<li>Checks that the file does not already exists in HTML5 persistent storage</li>
+<li>Calls <code>downloadFile(url, success)</code> with <code>saveFile(blob, path)</code> as callback</li>
+</ul>
+</li>
+<li>
+<code>downloadFile(url, success)</code>
+
+<ul>
+<li>Create HTTP request for URL</li>
+<li>Download blob of URL and pass it to success callback</li>
+</ul>
+</li>
+<li>
+<code>saveFile(blob, path)</code>
+
+<ul>
+<li>Splits path of blob into folders and creates them using <code>createDir(folders)</code> if they don't exist</li>
+<li>Create file and write blob to HTML5 persistent storage</li>
+<li>Call <code>handleFile(file)</code> for the next file in list of selected files</li>
+</ul>
+</li>
+</ul><p>The source for these files can be found <a href="https://gist.github.com/nicolaslangley/8cecc8294d56d03bab3b">here</a></p>
+
+<h4>
+<a name="-converting-to-nacl-chrome-app" class="anchor" href="#-converting-to-nacl-chrome-app"><span class="octicon octicon-link"></span></a> Converting to NaCl Chrome App</h4>
+
+<p>In order to distribute and run your NaCl application outside of the development environment, it is required to package
+it as a Chrome Extension (Chrome App).</p>
+
+<p>Here are some useful links from Google about this process:</p>
+
+<ul>
+<li><a href="https://developer.chrome.com/extensions/apps">Packaged Apps Overview</a></li>
+<li><a href="https://developer.chrome.com/native-client/devguide/distributing">Distributing a NaCl App</a></li>
+<li><a href="https://developer.chrome.com/extensions/packaging">How to Package a Chrome App</a></li>
+</ul><p>Here I will outline some of these steps as well as any changes that were required within the source by this process.</p>
+
+<p>The main addition that is required in order to create a packaged Chrome Application is the presence of a <code>manifest.json</code>
+file that outlines some details about your application. A detailed outline can be found <a href="https://developer.chrome.com/extensions/manifest">here</a>.</p>
+
+<p>The <code>manifest.json</code> file that I used was quite simple:</p>
+
+<pre><code>{
+  "manifest_version": 2,
+  "name": "GLBenchmark 2.7.0",
+  "version": "1.0",
+
+  "description": "Native Client Version of GLBenchmark",
+  "icons": {"128": "icon128.png"},
+
+  "minimum_chrome_version": "28",
+  "offline_enabled": true,
+
+  "permissions": [
+    "unlimitedStorage",
+    "storage"
+  ],
+  "app": {
+    "launch": {
+      "local_path": "index.html",
+      "container": "panel"
+    }
+  }
+}
+</code></pre>
+
+<p>The <code>"container"</code> property determines if the Chrome App launches in a new tab or it's own window.</p>
+
+<p>The other major change required by using a packaged app was the bundling of assets. In <a href="#assetman">the previous section</a> I
+outlined how assets were copied based on user input. Since all of the data assets are included along with the Chrome App
+there is no need for any user input. The previous method was reliant on the <code>&lt;input&gt;</code> tag for the list of data files and
+there is no way to mimic an <code>&lt;input&gt;</code> tag programatically. Inorder to get a list of all of the asset files, I was forced to
+generate a textfile with a list of all of the filenames. This could then be loaded and parsed in the JavaScript to form a
+list of files. The updated JavaScript code can be found <a href="https://gist.github.com/nicolaslangley/e290c1da767ea4056c7c">here</a>.</p>
+
+<p>Here is a Python script used to generate a text file with all of the filenames stored in the <code>/data/</code> directory:</p>
+
+<div class="highlight highlight-python"><pre><span class="kn">import</span> <span class="nn">os</span>
+<span class="n">curpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">();</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">"filelist.txt"</span><span class="p">,</span> <span class="s">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">a</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">subdirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">curpath</span><span class="p">):</span>
+       <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+         <span class="n">relpath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">curpath</span><span class="p">);</span> 
+         <span class="k">if</span> <span class="n">relpath</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s">"data"</span><span class="p">:</span>
+           <span class="n">f</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">relpath</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+           <span class="n">a</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">linesep</span><span class="p">)</span>
+</pre></div>
+
+<p>You can then load Chrome and package your application into a <code>.crx</code> which can be distributed (see <a href="https://developer.chrome.com/extensions/packaging">link</a> above) and installed by other Chrome users.</p>
+
+<h4>
+<a name="-debugging-and-logging" class="anchor" href="#-debugging-and-logging"><span class="octicon octicon-link"></span></a> Debugging and Logging</h4>
+
+<p>Debugging and logging in Chrome are covered extensively <a href="https://developer.chrome.com/native-client/devguide/devcycle/debugging">here</a>
+but I will go into some detail about a couple of techniques that I used that were helpful in working on the GLB 
+example.</p>
+
+<p>The main way of debugging a NaCl app is to use either the included version of <code>nacl-gdb</code> that is bundled in the NaCl SDK.
+This can be launched within Visual Studio 2010 if the NaCl plugin is installed (see <a href="#vs_tool">Visual Studio section</a>) or
+from the command line by launching Chrome with the <code>--enable-nacl-debug</code> flag and then running the <code>nacl-gdb</code> executable
+found in the NaCl SDK.</p>
+
+<p>This latter process can be made more seamless by loading a script that performs the setup detailed in the linked document
+above. This is done by using the <code>-x</code> flag with the name of the script as an argument when running nacl-gdb from the command
+line.</p>
+
+<p>The script I used was:</p>
+
+<pre><code>target remote localhost:4014
+nacl-manifest "GLBenchmark_2_7_0\projects\nacl\newlib\glbench_nacl_vs10.nmf"
+remote get irt .\irt.nexe
+nacl-irt .\irt.nexe
+</code></pre>
+
+<p>Where the <code>nacl-manifest</code> location denotes wherever the <code>.nmf</code> file is stored</p>
+
+<p>Within the code, and working with OpenGL code specifically, I found that a useful feature of GDB is the ability to
+dynamically call global functions while debugging. This is extremely useful for determining the output of <code>glGetError()</code> or
+<code>glGetString()</code> at runtime without having to add unnecessary calls within your code. I simply added the following global
+functions:</p>
+
+<div class="highlight highlight-cpp"><pre><span class="c1">// Global GL functions for debugging</span>
+<span class="n">GLenum</span> <span class="nf">GetGLError</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">GLenum</span> <span class="n">error</span> <span class="o">=</span> <span class="n">glGetError</span><span class="p">();</span>
+  <span class="k">return</span> <span class="n">error</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">const</span> <span class="n">GLubyte</span><span class="o">*</span> <span class="nf">GetGLString</span><span class="p">()</span> <span class="p">{</span>
+  <span class="k">const</span> <span class="n">GLubyte</span><span class="o">*</span> <span class="n">vendor</span> <span class="o">=</span> <span class="n">glGetString</span><span class="p">(</span><span class="n">GL_VENDOR</span><span class="p">);</span>
+  <span class="k">return</span> <span class="n">vendor</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>And used the GDB <a href="https://sourceware.org/gdb/onlinedocs/gdb/Calling.html"><code>call</code></a> function to retrieve the output while
+debugging.</p>
+
+<p>Logging within your Native Client code can be done by redirecting the <code>stdout</code> and <code>stderr</code> channels or by using the
+<code>PostMessage()</code> function within your code. However, <code>PostMessage()</code> is a member function of the current instance and so in
+order to be able to use <code>PostMessage()</code> outside of the instance I had to make a global reference to the instance and 
+access it in any other class or function to use <code>PostMessage()</code>. This is not as trivial as it sounds and requires passing
+an ID of the instance as a <code>PP_Instance</code> value.</p>
+
+<p>Within the instance class we have to retrieve the <code>PP_Instance</code> value:</p>
+
+<div class="highlight highlight-cpp"><pre><span class="n">g_instance</span> <span class="o">=</span> <span class="k">this</span><span class="o">-&gt;</span><span class="n">pp_instance</span><span class="p">();</span>
+</pre></div>
+
+<p>And within the class that we want to add access to <code>PostMessage()</code> in:</p>
+
+<div class="highlight highlight-cpp"><pre><span class="n">pp</span><span class="o">::</span><span class="n">Instance</span> <span class="n">cur_instance</span> <span class="o">=</span> <span class="n">pp</span><span class="o">::</span><span class="n">Instance</span><span class="p">(</span><span class="n">g_instance</span><span class="p">);</span>
+<span class="n">cur_instance</span><span class="p">.</span><span class="n">PostMessage</span><span class="p">(...);</span>
+</pre></div>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/nicolaslangley">nicolaslangley</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
