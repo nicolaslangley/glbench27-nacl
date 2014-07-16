@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <title>GLBenchmark 2.7.0 - Native Client Version</title>
+ 
+  <script src="glbench_nacl.js"></script>
+</head>
+
+<body>
+
+  <h1>GLBenchmark 2.7.0 - Native Client Version</h1>
+  <h2>Status <code id="statusField">NO-STATUS</code></h2>
+  <form id="test_form" method="post">
+        <fieldset>
+                <legend>Choose test to run:</legend>
+                        <input type="radio" name="test" id="trex_on" value="TRex2_7_0_Onscreen" />TRex 2.7.0 Onscreen<br />
+                        <input type="radio" name="test" id="trex_off" value="TRex2_7_0_Offscreen" />TRex 2.7.0 Offscreen<br />
+                        <input type="button" id="test_select_submit" value="Start test" />
+        </fieldset>
+  </form>
+  <input type="file" id="file_input" webkitdirectory="" directory=""/>
+  
+  <div id="listener">
+    <embed id="glbench_nacl_vs10"
+           width=1280 height=720
+           src="newlib/glbench_nacl_vs10.nmf"
+           type="application/x-nacl" />
+  </div>
+  
+</body>
+</html>

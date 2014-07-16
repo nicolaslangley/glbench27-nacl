@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <title>GLBench Test</title>
+ 
+  <script type="text/javascript">
+    OpenGLTestModule = null;  // Global application object.
+    statusText = 'NO-STATUS';
+
+    // Indicate load success.
+    function moduleDidLoad() {
+      OpenGLTestModule = document.getElementById('opengl_test');
+      updateStatus('SUCCESS');
+    }
+
+	// Handle message sent from NaCL module ( using pp::Instance.PostMessage())
+	// Display to console
+    function handleMessage(message_event) {
+      console.log(message_event.data);
+    }
+
+    // Set loading status message
+    function pageDidLoad() {
+      if (OpenGLTestModule == null) {
+        updateStatus('LOADING...');
+      } else {
+        // If Native Client loaded before page then update status
+        updateStatus();
+      }
+    }
+
+    // Set the global status message.  If the element with id 'statusField'
+    // exists, then set its HTML to the status message as well.
+    function updateStatus(opt_message) {
+      if (opt_message)
+        statusText = opt_message;
+      var statusField = document.getElementById('statusField');
+      if (statusField) {
+        statusField.innerHTML = statusText;
+      }
+    }
+  </script>
+</head>
+
+<body onload="pageDidLoad()">
+
+  <h1>GLBench NaCl PNacl - 1</h1>
+  <p>
+    <!--
+    Load the published pexe.
+	<embed> element is wrapped in listeners for messaging
+    -->
+    <div id="listener">
+      <script type="text/javascript">
+        var listener = document.getElementById('listener');
+        listener.addEventListener('load', moduleDidLoad, true);
+        listener.addEventListener('message', handleMessage, true);
+      </script>
+	
+	  <!--
+	  Want to perform a graphics context check before adding embed tag
+	  -->
+      <embed id="glb_nacl"
+             width=500 height=500
+             src="glbench_nacl.nmf"
+             type="application/x-pnacl" />
+    </div>
+  </p>
+  
+  <h2>Status <code id="statusField">NO-STATUS</code></h2>
+  
+</body>
+</html>

@@ -1,0 +1,368 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|NaCl64">
+      <Configuration>Debug</Configuration>
+      <Platform>NaCl64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|PNaCl">
+      <Configuration>Debug</Configuration>
+      <Platform>PNaCl</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|PPAPI">
+      <Configuration>Debug</Configuration>
+      <Platform>PPAPI</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|NaCl64">
+      <Configuration>Release</Configuration>
+      <Platform>NaCl64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|PNaCl">
+      <Configuration>Release</Configuration>
+      <Platform>PNaCl</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|PPAPI">
+      <Configuration>Release</Configuration>
+      <Platform>PPAPI</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\kcl_framework\kcl\src\kcl_actor.cpp" />
+    <ClCompile Include="..\..\kcl_framework\kcl\src\kcl_animation4.cpp" />
+    <ClCompile Include="..\..\kcl_framework\kcl\src\kcl_animationtrack.cpp" />
+    <ClCompile Include="..\..\kcl_framework\kcl\src\kcl_base.cpp" />
+    <ClCompile Include="..\..\kcl_framework\kcl\src\kcl_camera2.cpp" />
+    <ClCompile Include="..\..\kcl_framework\kcl\src\kcl_image.cpp" />
+    <ClCompile Include="..\..\kcl_framework\kcl\src\kcl_io.cpp" />
+    <ClCompile Include="..\..\kcl_framework\kcl\src\kcl_lod.cpp" />
+    <ClCompile Include="..\..\kcl_framework\kcl\src\kcl_material.cpp" />
+    <ClCompile Include="..\..\kcl_framework\kcl\src\kcl_math3d.cpp" />
+    <ClCompile Include="..\..\kcl_framework\kcl\src\kcl_mesh.cpp" />
+    <ClCompile Include="..\..\kcl_framework\kcl\src\kcl_node.cpp" />
+    <ClCompile Include="..\..\kcl_framework\kcl\src\kcl_particlesystem.cpp" />
+    <ClCompile Include="..\..\kcl_framework\kcl\src\kcl_planarmap.cpp" />
+    <ClCompile Include="..\..\kcl_framework\kcl\src\kcl_room.cpp" />
+    <ClCompile Include="..\..\kcl_framework\kcl\src\kcl_scene_handler.cpp" />
+    <ClCompile Include="..\..\kcl_framework\kcl\src\kcl_scene_xml.cpp" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libetc1\src\etc1.cpp" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libpng\src\png.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libpng\src\pngerror.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libpng\src\pngget.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libpng\src\pngmem.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libpng\src\pngread.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libpng\src\pngrio.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libpng\src\pngrtran.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libpng\src\pngrutil.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libpng\src\pngset.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libpng\src\pngtrans.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libpng\src\pngwio.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libpng\src\pngwrite.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libpng\src\pngwtran.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libpng\src\pngwutil.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libz\src\adler32.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libz\src\compress.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libz\src\crc32.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libz\src\deflate.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libz\src\gzlib.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libz\src\gzwrite.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libz\src\inffast.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libz\src\inflate.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libz\src\inftrees.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libz\src\trees.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libz\src\uncompr.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\libz\src\zutil.c" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\tinyxml\src\tinystr.cpp" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\tinyxml\src\tinyxml.cpp" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\tinyxml\src\tinyxmlerror.cpp" />
+    <ClCompile Include="..\..\kcl_framework\kcl_libraries\tinyxml\src\tinyxmlparser.cpp" />
+    <ClCompile Include="..\..\src\application\app.cpp" />
+    <ClCompile Include="..\..\src\application\app_cmdline_parser.cpp" />
+    <ClCompile Include="..\..\src\application\app_opengl.cpp" />
+    <ClCompile Include="..\..\src\application\app_result.cpp" />
+    <ClCompile Include="..\..\src\common\batterylogger.cpp" />
+    <ClCompile Include="..\..\src\common\bitmask.cpp" />
+    <ClCompile Include="..\..\src\common\eglutils.cpp" />
+    <ClCompile Include="..\..\src\common\ext.cpp" />
+    <ClCompile Include="..\..\src\common\fbo.cpp" />
+    <ClCompile Include="..\..\src\common\font.cpp" />
+    <ClCompile Include="..\..\src\common\framelogger.cpp" />
+    <ClCompile Include="..\..\src\common\glbshader.cpp" />
+    <ClCompile Include="..\..\src\common\glb_module.cpp" />
+    <ClCompile Include="..\..\src\common\glb_opengl_state_manager.cpp" />
+    <ClCompile Include="..\..\src\common\glb_version.cpp" />
+    <ClCompile Include="..\..\src\common\glwindow.cpp" />
+    <ClCompile Include="..\..\src\common\info_egl.cpp" />
+    <ClCompile Include="..\..\src\common\info_opengl.cpp" />
+    <ClCompile Include="..\..\src\common\misc2.cpp" />
+    <ClCompile Include="..\..\src\common\misc2_opengl.cpp" />
+    <ClCompile Include="..\..\src\common\nulldriver.cpp" />
+    <ClCompile Include="..\..\src\common\opengl\glb_image.cpp" />
+    <ClCompile Include="..\..\src\common\opengl\notificationman_opengl.cpp" />
+    <ClCompile Include="..\..\src\common\opengl\offscrman_opengl.cpp" />
+    <ClCompile Include="..\..\src\common\opengl\test_descriptor.cpp" />
+    <ClCompile Include="..\..\src\common\opengl\texture.cpp" />
+    <ClCompile Include="..\..\src\common\printable_result.cpp" />
+    <ClCompile Include="..\..\src\common\render_statistics.cpp" />
+    <ClCompile Include="..\..\src\common\stdc_kd.c" />
+    <ClCompile Include="..\..\src\common\testdescriptor_helper.cpp" />
+    <ClCompile Include="..\..\src\common\test_error.cpp" />
+    <ClCompile Include="..\..\src\common\uploaddata.cpp" />
+    <ClCompile Include="..\..\src\common\xml_utils.cpp" />
+    <ClCompile Include="..\..\src\platforms\nacl\kcl_io_os.cpp" />
+    <ClCompile Include="..\..\src\platforms\nacl\kcl_os.cpp" />
+    <ClCompile Include="..\..\src\platforms\nacl\naclwindow.cpp" />
+    <ClCompile Include="..\..\src\platforms\nacl\nacl_egl.cpp" />
+    <ClCompile Include="..\..\src\platforms\nacl\nacl_main.cpp" />
+    <ClCompile Include="..\..\src\targets\glb27\test_interface.cpp" />
+    <ClCompile Include="..\..\src\targets\glb27\test_interface_generate.cpp" />
+    <ClCompile Include="..\..\src\test_module\high_level_tests_3\engine.cpp" />
+    <ClCompile Include="..\..\src\test_module\high_level_tests_3\glbtypes.cpp" />
+    <ClCompile Include="..\..\src\test_module\high_level_tests_3\glb_scene_utils_opengl.cpp" />
+    <ClCompile Include="..\..\src\test_module\high_level_tests_3\krl_material.cpp" />
+    <ClCompile Include="..\..\src\test_module\high_level_tests_3\krl_scene.cpp" />
+    <ClCompile Include="..\..\src\test_module\high_level_tests_3\opengl\cubemap_opengl.cpp" />
+    <ClCompile Include="..\..\src\test_module\high_level_tests_3\opengl\glb_material.cpp" />
+    <ClCompile Include="..\..\src\test_module\high_level_tests_3\opengl\glb_material_opengl.cpp" />
+    <ClCompile Include="..\..\src\test_module\high_level_tests_3\opengl\glb_mesh.cpp" />
+    <ClCompile Include="..\..\src\test_module\high_level_tests_3\opengl\glb_mesh_opengl.cpp" />
+    <ClCompile Include="..\..\src\test_module\high_level_tests_3\opengl\glb_planarmap_opengl.cpp" />
+    <ClCompile Include="..\..\src\test_module\high_level_tests_3\opengl\glb_scene.cpp" />
+    <ClCompile Include="..\..\src\test_module\high_level_tests_3\opengl\glb_scene_opengl.cpp" />
+    <ClCompile Include="..\..\src\test_module\high_level_tests_3\opengl\glb_scene_opengl27.cpp" />
+    <ClCompile Include="..\..\src\test_module\high_level_tests_3\opengl\glb_scene_opengl27_framecapture.cpp" />
+    <ClCompile Include="..\..\src\test_module\high_level_tests_3\opengl\low_level_tests.cpp" />
+    <ClCompile Include="..\..\src\test_module\high_level_tests_3\opengl\low_level_tests_opengl.cpp" />
+    <ClCompile Include="..\..\src\test_module\high_level_tests_3\opengl\shader.cpp" />
+    <ClCompile Include="..\..\src\test_module\high_level_tests_3\opengl\shadowmap_opengl.cpp" />
+    <ClCompile Include="..\..\src\test_module\high_level_tests_3\opengl\test_interface3.cpp" />
+    <ClCompile Include="..\..\src\test_module\high_level_tests_3\opengl\vbopool.cpp" />
+    <ClCompile Include="..\..\src\test_module\high_level_tests_3\spacepartition.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\kcl_framework\kcl\src\kcl_aabb.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl\src\kcl_actor.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl\src\kcl_animation4.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl\src\kcl_animationtrack.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl\src\kcl_base.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl\src\kcl_camera2.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl\src\kcl_image.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl\src\kcl_io.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl\src\kcl_keyframesequence.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl\src\kcl_light2.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl\src\kcl_material.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl\src\kcl_math3d.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl\src\kcl_mesh.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl\src\kcl_node.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl\src\kcl_object.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl\src\kcl_os.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl\src\kcl_particlesystem.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl\src\kcl_planarmap.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl\src\kcl_room.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl\src\kcl_scene_handler.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl_libraries\libetc1\src\etc1.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl_libraries\libpng\src\png.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl_libraries\libpng\src\pngconf.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl_libraries\libpng\src\pngdebug.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl_libraries\libpng\src\pnginfo.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl_libraries\libpng\src\pnglibconf.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl_libraries\libpng\src\pngpriv.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl_libraries\libpng\src\pngstruct.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl_libraries\libz\src\crc32.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl_libraries\libz\src\deflate.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl_libraries\libz\src\gzguts.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl_libraries\libz\src\inffast.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl_libraries\libz\src\inffixed.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl_libraries\libz\src\inflate.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl_libraries\libz\src\inftrees.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl_libraries\libz\src\trees.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl_libraries\libz\src\zconf.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl_libraries\libz\src\zlib.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl_libraries\libz\src\zutil.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl_libraries\tinyxml\src\tinystr.h" />
+    <ClInclude Include="..\..\kcl_framework\kcl_libraries\tinyxml\src\tinyxml.h" />
+    <ClInclude Include="..\..\src\application\app.h" />
+    <ClInclude Include="..\..\src\common\array.h" />
+    <ClInclude Include="..\..\src\common\batterylogger.h" />
+    <ClInclude Include="..\..\src\common\bitmask.h" />
+    <ClInclude Include="..\..\src\common\collect_selectedtests.h" />
+    <ClInclude Include="..\..\src\common\eglutils.h" />
+    <ClInclude Include="..\..\src\common\ext.h" />
+    <ClInclude Include="..\..\src\common\fbo.h" />
+    <ClInclude Include="..\..\src\common\font.h" />
+    <ClInclude Include="..\..\src\common\framelogger.h" />
+    <ClInclude Include="..\..\src\common\glbshader.h" />
+    <ClInclude Include="..\..\src\common\glbtypes.h" />
+    <ClInclude Include="..\..\src\common\glb_kcl_adapter.h" />
+    <ClInclude Include="..\..\src\common\glb_module.h" />
+    <ClInclude Include="..\..\src\common\glb_version.h" />
+    <ClInclude Include="..\..\src\common\glwindow.h" />
+    <ClInclude Include="..\..\src\common\info_egl.h" />
+    <ClInclude Include="..\..\src\common\info_glbdefs.h" />
+    <ClInclude Include="..\..\src\common\info_opengl.h" />
+    <ClInclude Include="..\..\src\common\misc2.h" />
+    <ClInclude Include="..\..\src\common\misc2_opengl.h" />
+    <ClInclude Include="..\..\src\common\nulldriver.h" />
+    <ClInclude Include="..\..\src\common\ogl_man\glb_opengl_state_manager.h" />
+    <ClInclude Include="..\..\src\common\ogl_man_cap\glb_opengl_state_manager.h" />
+    <ClInclude Include="..\..\src\common\opengl\glb_image.h" />
+    <ClInclude Include="..\..\src\common\opengl\notificationman.h" />
+    <ClInclude Include="..\..\src\common\opengl\offscrman.h" />
+    <ClInclude Include="..\..\src\common\opengl\texture.h" />
+    <ClInclude Include="..\..\src\common\printable_result.h" />
+    <ClInclude Include="..\..\src\common\render_statistics.h" />
+    <ClInclude Include="..\..\src\common\render_statistics_defines.h" />
+    <ClInclude Include="..\..\src\common\resultsender.h" />
+    <ClInclude Include="..\..\src\common\stdc.h" />
+    <ClInclude Include="..\..\src\common\testdescriptor_helper.h" />
+    <ClInclude Include="..\..\src\common\test_base.h" />
+    <ClInclude Include="..\..\src\common\test_descriptor.h" />
+    <ClInclude Include="..\..\src\common\test_error.h" />
+    <ClInclude Include="..\..\src\common\uploaddata.h" />
+    <ClInclude Include="..\..\src\common\xml_utils.h" />
+    <ClInclude Include="..\..\src\platforms\nacl\include\EGL\egl.h" />
+    <ClInclude Include="..\..\src\platforms\nacl\include\platform.h" />
+    <ClInclude Include="..\..\src\platforms\nacl\kcl_osimpl_nacl.h" />
+    <ClInclude Include="..\..\src\platforms\nacl\naclwindow.h" />
+    <ClInclude Include="..\..\src\targets\glb27\test_interface.h" />
+    <ClInclude Include="..\..\src\targets\include_test_interfaces.h" />
+    <ClInclude Include="..\..\src\targets\test_ids.h" />
+    <ClInclude Include="..\..\src\test_module\high_level_tests_3\engine.h" />
+    <ClInclude Include="..\..\src\test_module\high_level_tests_3\krl_material.h" />
+    <ClInclude Include="..\..\src\test_module\high_level_tests_3\krl_scene.h" />
+    <ClInclude Include="..\..\src\test_module\high_level_tests_3\opengl\cubemap.h" />
+    <ClInclude Include="..\..\src\test_module\high_level_tests_3\opengl\glb_material.h" />
+    <ClInclude Include="..\..\src\test_module\high_level_tests_3\opengl\glb_mesh.h" />
+    <ClInclude Include="..\..\src\test_module\high_level_tests_3\opengl\glb_planarmap.h" />
+    <ClInclude Include="..\..\src\test_module\high_level_tests_3\opengl\glb_scene.h" />
+    <ClInclude Include="..\..\src\test_module\high_level_tests_3\opengl\low_level_tests.h" />
+    <ClInclude Include="..\..\src\test_module\high_level_tests_3\opengl\shader.h" />
+    <ClInclude Include="..\..\src\test_module\high_level_tests_3\opengl\shadowmap.h" />
+    <ClInclude Include="..\..\src\test_module\high_level_tests_3\opengl\vbopool.h" />
+    <ClInclude Include="..\..\src\test_module\high_level_tests_3\spacepartition.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="glbench_nacl.js" />
+    <None Include="index.html" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{521EB95B-8B8C-458E-B17E-938DFF092878}</ProjectGuid>
+    <RootNamespace>glbench_nacl_vs10</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|NaCl64'">
+    <NaClAddInVersion>1</NaClAddInVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|PPAPI'">
+    <NaClAddInVersion>1</NaClAddInVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|NaCl64'">
+    <NaClAddInVersion>1</NaClAddInVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|PPAPI'">
+    <NaClAddInVersion>1</NaClAddInVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|PNaCl'">
+    <NaClAddInVersion>1</NaClAddInVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|PNaCl'">
+    <NaClAddInVersion>1</NaClAddInVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|NaCl64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(GL_BENCH_SRC)\platforms\nacl\include;$(GL_BENCH_SRC)\application;$(GL_BENCH_SRC)\common;$(GL_BENCH_SRC)\common\opengl;$(GL_BENCH_SRC)\common\ogl_man;$(GL_BENCH_SRC)\targets;$(GL_BENCH_SRC)\test_module;$(GL_BENCH_SRC)\test_module\high_level_tests_3;$(GL_BENCH_SRC)\test_module\high_level_tests_3\opengl;$(GL_BENCH_SRC)\..\kcl_framework\kcl\src;$(GL_BENCH_SRC)\..\kcl_framework\kcl_libraries\libz\src;$(GL_BENCH_SRC)\..\kcl_framework\kcl_libraries\tinyxml\src;$(GL_BENCH_SRC)\..\kcl_framework\kcl_libraries\libpng\src;$(GL_BENCH_SRC)\..\kcl_framework\kcl_libraries\libetc1\src;$(GL_BENCH_SRC);$(NACL_SDK_ROOT)\include\$(ToolchainName);$(NACL_SDK_ROOT)\toolchain\win_x86_newlib\x86_64-nacl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>OPENGL_ES2;STATIC_LINKED_LIBRARY;GENERATE_XML;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <GenerateDebuggingInformation>true</GenerateDebuggingInformation>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>ppapi_cpp;ppapi;ppapi_gles2;pthread;nacl_io</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|PPAPI'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(GL_BENCH_SRC)\platforms\nacl\include;$(GL_BENCH_SRC)\application;$(GL_BENCH_SRC)\common;$(GL_BENCH_SRC)\common\opengl;$(GL_BENCH_SRC)\common\ogl_man;$(GL_BENCH_SRC)\targets;$(GL_BENCH_SRC)\test_module;$(GL_BENCH_SRC)\test_module\high_level_tests_3;$(GL_BENCH_SRC)\test_module\high_level_tests_3\opengl;$(GL_BENCH_SRC)\..\kcl_framework\kcl\src;$(GL_BENCH_SRC)\..\kcl_framework\kcl_libraries\libz\src;$(GL_BENCH_SRC)\..\kcl_framework\kcl_libraries\tinyxml\src;$(GL_BENCH_SRC)\..\kcl_framework\kcl_libraries\libpng\src;$(GL_BENCH_SRC)\..\kcl_framework\kcl_libraries\libetc1\src;$(GL_BENCH_SRC);$(NACL_SDK_ROOT)\include\newlib;$(NACL_SDK_ROOT)\toolchain\win_x86_newlib\x86_64-nacl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>OPENGL_ES2;STATIC_LINKED_LIBRARY;INTERCEPT;__native_client__;__LITTLE_ENDIAN__;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <GenerateDebuggingInformation>true</GenerateDebuggingInformation>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>ppapi_cpp.lib;ppapi.lib;ppapi_gles2.lib;pthread.lib;nacl_io.lib;</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|NaCl64'">
+    <Link>
+      <AdditionalDependencies>ppapi_cpp;ppapi;</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|PPAPI'">
+    <Link>
+      <AdditionalDependencies>ppapi_cpp.lib;ppapi.lib;</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|PNaCl'">
+    <Link>
+      <AdditionalDependencies>ppapi_cpp;ppapi;ppapi_gles2;pthread;nacl_io</AdditionalDependencies>
+    </Link>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(GL_BENCH_SRC)\platforms\nacl\include;$(GL_BENCH_SRC)\application;$(GL_BENCH_SRC)\common;$(GL_BENCH_SRC)\common\opengl;$(GL_BENCH_SRC)\common\ogl_man;$(GL_BENCH_SRC)\targets;$(GL_BENCH_SRC)\test_module;$(GL_BENCH_SRC)\test_module\high_level_tests_3;$(GL_BENCH_SRC)\test_module\high_level_tests_3\opengl;$(GL_BENCH_SRC)\..\kcl_framework\kcl\src;$(GL_BENCH_SRC)\..\kcl_framework\kcl_libraries\libz\src;$(GL_BENCH_SRC)\..\kcl_framework\kcl_libraries\tinyxml\src;$(GL_BENCH_SRC)\..\kcl_framework\kcl_libraries\libpng\src;$(GL_BENCH_SRC)\..\kcl_framework\kcl_libraries\libetc1\src;$(GL_BENCH_SRC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>OPENGL_ES2;STATIC_LINKED_LIBRARY;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|PNaCl'">
+    <Link>
+      <AdditionalDependencies>ppapi_cpp;ppapi;</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

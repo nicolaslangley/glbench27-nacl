@@ -1,0 +1,8 @@
+{
+  "files": {},
+  "program": {
+    "x86-64": {
+      "url": "../NaCl64/newlib/Debug/glbench_nacl_vs10_64.nexe"
+    }
+  }
+}

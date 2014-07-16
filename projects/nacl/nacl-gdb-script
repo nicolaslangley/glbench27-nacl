@@ -1,0 +1,4 @@
+target remote localhost:4014
+nacl-manifest "C:\Users\Nicolas\Development\GLBenchmark_2_7_0\projects\nacl\newlib\glbench_nacl_vs10.nmf"
+remote get irt .\irt.nexe
+nacl-irt .\irt.nexe

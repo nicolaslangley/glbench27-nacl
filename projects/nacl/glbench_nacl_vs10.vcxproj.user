@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ShowAllFiles>false</ShowAllFiles>
+    <LocalDebuggerCommand Condition="'$(Configuration)|$(Platform)'=='Debug|NaCl64'">C:\Program Files (x86)\Google\Chrome\Application\chrome.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand Condition="'$(Configuration)|$(Platform)'=='Release|NaCl64'">C:\Program Files (x86)\Google\Chrome\Application\chrome.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand Condition="'$(Configuration)|$(Platform)'=='Debug|PNaCl'">C:\Program Files (x86)\Google\Chrome\Application\chrome.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand Condition="'$(Configuration)|$(Platform)'=='Release|PNaCl'">C:\Program Files (x86)\Google\Chrome\Application\chrome.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommandArguments Condition="'$(Configuration)|$(Platform)'=='Debug|NaCl64'">--enable-nacl-debug --no-sandbox localhost:$(NaClWebServerPort)/$(NaClIndexHTML) --user-data-dir="$(ProjectDir)/chrome_data" --enable-nacl</LocalDebuggerCommandArguments>
+    <DebuggerFlavor Condition="'$(Configuration)|$(Platform)'=='Debug|NaCl64'">WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommand Condition="'$(Configuration)|$(Platform)'=='Debug|PPAPI'">C:\Program Files (x86)\Google\Chrome\Application\chrome.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommand Condition="'$(Configuration)|$(Platform)'=='Release|PPAPI'">C:\Program Files (x86)\Google\Chrome\Application\chrome.exe</LocalDebuggerCommand>
+  </PropertyGroup>
+</Project>
